@@ -10,20 +10,24 @@
             overflow: hidden;
         }
 
-#game-container {
-    position: relative;
-    width: 400px;
-    height: 700px;
-    background: #4b6cb7; /* Base color */
-    overflow: hidden;
-}
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 700px;
+            border: 6px solid #222;
+            border-radius: 20px;
+            overflow: hidden;
+            /* Background mimics the image: Blue sky to orange lava horizon */
+            background: linear-gradient(to bottom, #4b6cb7 0%, #182848 40%, #e67e22 85%, #ff4500 100%);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
 
         canvas { display: block; }
 
         .overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,26 +50,26 @@
         }
 
         .title {
-            color: #ff4500;
-            font-size: 42px;
+            color: #ff9900;
+            font-size: 38px;
             text-shadow: 4px 4px 0px #000;
             margin-bottom: 20px;
+            line-height: 1;
         }
 
         .orange-btn {
-            background: #ff4500;
+            background: #ff9900;
             border: 3px solid #fff;
             color: white;
             padding: 15px 50px;
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 12px;
-            box-shadow: 0 6px 0 #992d00;
-            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 6px 0 #b36b00;
         }
 
-        .orange-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #992d00; }
+        .orange-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b36b00; }
 
         .home-icon {
             font-size: 45px;
@@ -73,10 +77,7 @@
             border: none;
             color: #ffcc00;
             cursor: pointer;
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
-
-        .stat-text { font-size: 20px; color: #ccc; margin-bottom: 15px; }
-
-
+        .stat-text { font-size: 18px; color: #ccc; margin-bottom: 10px; }
