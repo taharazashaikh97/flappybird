@@ -78,37 +78,29 @@
             ctx.restore();
         }
 
-        function drawPipes() {
-            pipes.forEach(pipe => {
-                // Stone Pipe Body
-                ctx.fillStyle = '#222';
-                ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
-                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
+      function drawPipes() {
+    pipes.forEach(pipe => {
+        // Create lava gradient for top pipe
+        let topGradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, pipe.top);
+        topGradient.addColorStop(0, '#ff4500'); // bright orange
+        topGradient.addColorStop(0.5, '#ff8c00'); // yellow-orange
+        topGradient.addColorStop(1, '#8b0000'); // dark red
 
-                // FLOWING LAVA EFFECT
-                ctx.fillStyle = '#ff4500';
-                
-                // Top pipe lava drips
-                for (let j = 0; j < 3; j++) {
-                    let streamX = pipe.x + 10 + (j * 20);
-                    let streamY = (lavaOffset + (j * 30)) % pipe.top;
-                    ctx.fillRect(streamX, streamY, 4, 25);
-                    // Glowing aura
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = "#ff4500";
-                }
+        // Draw top pipe
+        ctx.fillStyle = topGradient;
+        ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
 
-                // Bottom pipe lava drips
-                for (let j = 0; j < 3; j++) {
-                    let streamX = pipe.x + 10 + (j * 20);
-                    let startY = canvas.height - pipe.bottom;
-                    let streamY = startY + ((lavaOffset + (j * 40)) % pipe.bottom);
-                    ctx.fillRect(streamX, streamY, 4, 25);
-                }
-                ctx.shadowBlur = 0; // Reset shadow for next drawings
-            });
-        }
+        // Create lava gradient for bottom pipe
+        let bottomGradient = ctx.createLinearGradient(pipe.x, canvas.height - pipe.bottom, pipe.x + pipe.width, canvas.height);
+        bottomGradient.addColorStop(0, '#8b0000'); // dark red
+        bottomGradient.addColorStop(0.5, '#ff8c00'); // yellow-orange
+        bottomGradient.addColorStop(1, '#ff4500'); // bright orange
 
+        // Draw bottom pipe
+        ctx.fillStyle = bottomGradient;
+        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
+    });
+}
         function update() {
             if (gameState !== 'PLAYING') return;
 
@@ -166,3 +158,4 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
+
