@@ -5,7 +5,7 @@
         const gameOverPage = document.getElementById('game-over');
         const hiValHome = document.getElementById('hi-val-home');
         const finalScoreText = document.getElementById('final-score-text');
-     
+
         canvas.width = 400;
         canvas.height = 700;
 
@@ -49,74 +49,31 @@
             scoreLive.style.display = 'none';
         }
 
-function drawBird() {
-    ctx.save();
+        function drawBird() {
+            ctx.save();
+            ctx.translate(bird.x + bird.w/2, bird.y + bird.h/2);
+            ctx.rotate(Math.min(Math.PI/4, Math.max(-Math.PI/3, bird.velocity * 0.06)));
+            
+            // Yellow body with black outline
+            ctx.fillStyle = '#f7d308';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, bird.w/2, bird.h/2, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
 
-    // Move to bird center & rotate based on velocity
-    ctx.translate(bird.x + bird.w / 2, bird.y + bird.h / 2);
-    ctx.rotate(Math.min(Math.PI / 5, Math.max(-Math.PI / 4, bird.velocity * 0.05)));
+            // Big Eye
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.arc(13, -5, 4, 0, Math.PI * 2); ctx.fill();
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#000";
+            // Wing
+            ctx.fillStyle = '#f7d308';
+            ctx.beginPath(); ctx.ellipse(-10, 5, 10, 6, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
-    /* === BODY === */
-    ctx.fillStyle = "#FFD200";
-    ctx.beginPath();
-    ctx.ellipse(0, 0, bird.w / 2, bird.h / 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    /* === BELLY SHADOW === */
-    ctx.fillStyle = "#FFC400";
-    ctx.beginPath();
-    ctx.ellipse(0, bird.h * 0.12, bird.w * 0.35, bird.h * 0.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    /* === EYES (BIG & CARTOONY) === */
-    // White eye
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    ctx.arc(bird.w * 0.15, -bird.h * 0.15, bird.w * 0.18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    // Pupil
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(bird.w * 0.18, -bird.h * 0.15, bird.w * 0.06, 0, Math.PI * 2);
-    ctx.fill();
-
-    /* === BEAK === */
-    ctx.fillStyle = "#FF8C00";
-    ctx.beginPath();
-    ctx.moveTo(bird.w * 0.35, 0);
-    ctx.lineTo(bird.w * 0.55, bird.h * 0.08);
-    ctx.lineTo(bird.w * 0.35, bird.h * 0.18);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    /* === WING === */
-    ctx.fillStyle = "#FFC400";
-    ctx.beginPath();
-    ctx.ellipse(-bird.w * 0.15, bird.h * 0.1, bird.w * 0.22, bird.h * 0.15, -0.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    /* === TAIL FEATHERS === */
-    ctx.fillStyle = "#000";
-    for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(-bird.w * 0.5, -bird.h * 0.05 + i * 6);
-        ctx.lineTo(-bird.w * 0.7, -bird.h * 0.12 + i * 6);
-        ctx.lineTo(-bird.w * 0.65, -bird.h * 0.02 + i * 6);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    ctx.restore();
-}
-
+            ctx.restore();
+        }
 
         function drawPipes() {
             pipes.forEach(pipe => {
@@ -214,7 +171,3 @@ function drawBird() {
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
-
-
-
-
