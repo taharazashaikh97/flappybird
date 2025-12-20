@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Flappy Volcano Bird</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial Black', sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 700px;
+            border: 6px solid #222;
+            border-radius: 20px;
+            overflow: hidden;
+            /* Background mimics the image: Blue sky to orange lava horizon */
+            background: linear-gradient(to bottom, #4b6cb7 0%, #182848 40%, #e67e22 85%, #ff4500 100%);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        canvas { display: block; }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            text-align: center;
+            z-index: 20;
+        }
+
+        #score-live {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            font-size: 60px;
+            color: #ffcc00;
+            text-shadow: 4px 4px 0px #000;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .title {
+            color: #ff9900;
+            font-size: 38px;
+            text-shadow: 4px 4px 0px #000;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+
+        .orange-btn {
+            background: #ff9900;
+            border: 3px solid #fff;
+            color: white;
+            padding: 15px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 6px 0 #b36b00;
+        }
+
+        .orange-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b36b00; }
+
+        .home-icon {
+            font-size: 45px;
+            background: none;
+            border: none;
+            color: #ffcc00;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .stat-text { font-size: 18px; color: #ccc; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="birdCanvas"></canvas>
+        <div id="score-live" style="display: none;">0</div>
+        
+        <div id="ui-layer">
+            <div id="home-page" class="overlay">
+                <h1 class="title">FLAPPY<br>VOLCANO BIRD</h1>
+                <p class="stat-text">HIGH SCORE: <span id="hi-val-home">0</span></p>
+                <button class="orange-btn" onclick="startGame()">START GAME</button>
+            </div>
+
+            <div id="game-over" class="overlay" style="display: none;">
+                <h1 class="title" style="color: #ff4500;">GAME OVER</h1>
+                <p id="final-score-text" class="stat-text"></p>
+                <button class="orange-btn" onclick="startGame()">RETRY</button>
+                <button class="home-icon" onclick="showHome()">⌂</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('birdCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreLive = document.getElementById('score-live');
+        const homePage = document.getElementById('home-page');
+        const gameOverPage = document.getElementById('game-over');
+        const hiValHome = document.getElementById('hi-val-home');
+        const finalScoreText = document.getElementById('final-score-text');
+
+        canvas.width = 400;
+        canvas.height = 700;
+
+        let gameState = 'HOME';
+        let score = 0;
+        let highScore = localStorage.getItem('vbird_hi') || 0;
+        hiValHome.innerText = highScore;
+
+        let bird = { x: 70, y: 350, w: 42, h: 34, velocity: 0, gravity: 0.5, lift: -9 };
+        let pipes = [];
+        let frame = 0;
+
+        function showHome() {
+            gameState = 'HOME';
+            homePage.style.display = 'flex';
+            gameOverPage.style.display = 'none';
+            scoreLive.style.display = 'none';
+        }
+
+        function startGame() {
+            score = 0;
+            pipes = [];
+            bird.y = 350;
+            bird.velocity = 0;
+            frame = 0;
+            gameState = 'PLAYING';
+            scoreLive.innerText = "0";
+            scoreLive.style.display = 'block';
+            homePage.style.display = 'none';
+            gameOverPage.style.display = 'none';
+        }
+
+        function gameOver() {
+            gameState = 'GAMEOVER';
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('vbird_hi', highScore);
+            }
+            finalScoreText.innerHTML = `SCORE: ${score} <br> HIGH SCORE: ${highScore}`;
+            gameOverPage.style.display = 'flex';
+            scoreLive.style.display = 'none';
+        }
+
+        function drawBird() {
+            ctx.save();
+            ctx.translate(bird.x + bird.w/2, bird.y + bird.h/2);
+            ctx.rotate(Math.min(Math.PI/4, Math.max(-Math.PI/3, bird.velocity * 0.06)));
+            
+            // Yellow body with black outline
+            ctx.fillStyle = '#f7d308';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, bird.w/2, bird.h/2, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+
+            // Big Eye
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.arc(13, -5, 4, 0, Math.PI * 2); ctx.fill();
+
+            // Wing
+            ctx.fillStyle = '#f7d308';
+            ctx.beginPath(); ctx.ellipse(-10, 5, 10, 6, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                // Main Pillar (Dark Rock)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
+
+                // Pipe Lips (The rim)
+                ctx.fillStyle = '#222';
+                ctx.fillRect(pipe.x - 5, pipe.top - 20, pipe.width + 10, 20);
+                ctx.fillRect(pipe.x - 5, canvas.height - pipe.bottom, pipe.width + 10, 20);
+
+                // LAVA CRACKS (The requested look)
+                ctx.strokeStyle = '#ff4500';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#ff2200";
+
+                // Top Pillar Cracks
+                ctx.beginPath();
+                ctx.moveTo(pipe.x + 10, 0);
+                ctx.lineTo(pipe.x + 30, pipe.top * 0.4);
+                ctx.lineTo(pipe.x + 15, pipe.top * 0.7);
+                ctx.lineTo(pipe.x + 40, pipe.top);
+                ctx.stroke();
+
+                // Bottom Pillar Cracks
+                let bStart = canvas.height - pipe.bottom;
+                ctx.beginPath();
+                ctx.moveTo(pipe.x + 40, bStart);
+                ctx.lineTo(pipe.x + 20, bStart + (pipe.bottom * 0.5));
+                ctx.lineTo(pipe.x + 50, canvas.height);
+                ctx.stroke();
+
+                ctx.shadowBlur = 0; // Reset for performance
+            });
+        }
+
+        function update() {
+            if (gameState !== 'PLAYING') return;
+
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (frame % 100 === 0) {
+                let gap = 180;
+                let topH = Math.random() * (canvas.height - gap - 300) + 100;
+                pipes.push({ x: canvas.width, top: topH, bottom: canvas.height - topH - gap, width: 70, passed: false });
+            }
+
+            pipes.forEach((pipe, i) => {
+                pipe.x -= 3.5;
+                if (bird.x + bird.w - 10 > pipe.x && bird.x + 10 < pipe.x + pipe.width) {
+                    if (bird.y + 5 < pipe.top || bird.y + bird.h - 5 > canvas.height - pipe.bottom) gameOver();
+                }
+                if (!pipe.passed && pipe.x < bird.x) {
+                    score++;
+                    scoreLive.innerText = score;
+                    pipe.passed = true;
+                }
+                if (pipe.x + pipe.width < -100) pipes.splice(i, 1);
+            });
+
+            if (bird.y + bird.h > canvas.height || bird.y < 0) gameOver();
+            frame++;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPipes();
+            
+            // Flowing Lava Floor
+            ctx.fillStyle = '#ff4500';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ff0000";
+            ctx.fillRect(0, canvas.height - 15, canvas.width, 15);
+            ctx.shadowBlur = 0;
+
+            drawBird();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function flap() {
+            if (gameState === 'PLAYING') bird.velocity = bird.lift;
+        }
+
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space') flap(); });
+        canvas.addEventListener('mousedown', () => flap());
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
+
+        loop();
+    </script>
+</body>
+</html>
