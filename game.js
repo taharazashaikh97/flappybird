@@ -104,6 +104,9 @@
         function update() {
             if (gameState !== 'PLAYING') return;
 
+         bgPos -= 0.5; 
+            document.getElementById('parallax-bg').style.transform = `translateX(${bgPos % 400}px)`;
+                
             lavaOffset += 2; // Speed of the lava flow
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
@@ -158,4 +161,5 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
+
 
