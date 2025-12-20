@@ -12,7 +12,6 @@
         let gameState = 'HOME';
         let score = 0;
         let highScore = localStorage.getItem('vbird_hi') || 0;
-        let lavaOffset = 0; // For the flowing animation
         hiValHome.innerText = highScore;
 
         let bird = { x: 70, y: 350, w: 42, h: 34, velocity: 0, gravity: 0.5, lift: -9 };
@@ -24,7 +23,6 @@
             homePage.style.display = 'flex';
             gameOverPage.style.display = 'none';
             scoreLive.style.display = 'none';
-            hiValHome.innerText = highScore;
         }
 
         function startGame() {
@@ -46,7 +44,7 @@
                 highScore = score;
                 localStorage.setItem('vbird_hi', highScore);
             }
-            finalScoreText.innerHTML = `SCORE: ${score} <br> BEST: ${highScore}`;
+            finalScoreText.innerHTML = `SCORE: ${score} <br> HIGH SCORE: ${highScore}`;
             gameOverPage.style.display = 'flex';
             scoreLive.style.display = 'none';
         }
@@ -56,7 +54,7 @@
             ctx.translate(bird.x + bird.w/2, bird.y + bird.h/2);
             ctx.rotate(Math.min(Math.PI/4, Math.max(-Math.PI/3, bird.velocity * 0.06)));
             
-            // Yellow Body
+            // Yellow body with black outline
             ctx.fillStyle = '#f7d308';
             ctx.strokeStyle = '#000';
             ctx.lineWidth = 2;
@@ -64,47 +62,60 @@
             ctx.ellipse(0, 0, bird.w/2, bird.h/2, 0, 0, Math.PI * 2);
             ctx.fill(); ctx.stroke();
 
-            // Eye
+            // Big Eye
             ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.arc(12, -6, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             ctx.fillStyle = 'black';
-            ctx.beginPath(); ctx.arc(15, -6, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(13, -5, 4, 0, Math.PI * 2); ctx.fill();
 
-            // Beak
-            ctx.fillStyle = '#ff4500';
-            ctx.beginPath();
-            ctx.moveTo(18, 0); ctx.lineTo(32, 6); ctx.lineTo(18, 12);
-            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Wing
+            ctx.fillStyle = '#f7d308';
+            ctx.beginPath(); ctx.ellipse(-10, 5, 10, 6, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
             ctx.restore();
         }
 
-      function drawPipes() {
-    pipes.forEach(pipe => {
-        // Create lava gradient for top pipe
-        let topGradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, pipe.top);
-        topGradient.addColorStop(0, '#ff4500'); // bright orange
-        topGradient.addColorStop(0.5, '#ff8c00'); // yellow-orange
-        topGradient.addColorStop(1, '#8b0000'); // dark red
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                // Main Pillar (Dark Rock)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
 
-        // Draw top pipe
-        ctx.fillStyle = topGradient;
-        ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+                // Pipe Lips (The rim)
+                ctx.fillStyle = '#222';
+                ctx.fillRect(pipe.x - 5, pipe.top - 20, pipe.width + 10, 20);
+                ctx.fillRect(pipe.x - 5, canvas.height - pipe.bottom, pipe.width + 10, 20);
 
-        // Create lava gradient for bottom pipe
-        let bottomGradient = ctx.createLinearGradient(pipe.x, canvas.height - pipe.bottom, pipe.x + pipe.width, canvas.height);
-        bottomGradient.addColorStop(0, '#8b0000'); // dark red
-        bottomGradient.addColorStop(0.5, '#ff8c00'); // yellow-orange
-        bottomGradient.addColorStop(1, '#ff4500'); // bright orange
+                // LAVA CRACKS (The requested look)
+                ctx.strokeStyle = '#ff4500';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#ff2200";
 
-        // Draw bottom pipe
-        ctx.fillStyle = bottomGradient;
-        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
-    });
-}
+                // Top Pillar Cracks
+                ctx.beginPath();
+                ctx.moveTo(pipe.x + 10, 0);
+                ctx.lineTo(pipe.x + 30, pipe.top * 0.4);
+                ctx.lineTo(pipe.x + 15, pipe.top * 0.7);
+                ctx.lineTo(pipe.x + 40, pipe.top);
+                ctx.stroke();
+
+                // Bottom Pillar Cracks
+                let bStart = canvas.height - pipe.bottom;
+                ctx.beginPath();
+                ctx.moveTo(pipe.x + 40, bStart);
+                ctx.lineTo(pipe.x + 20, bStart + (pipe.bottom * 0.5));
+                ctx.lineTo(pipe.x + 50, canvas.height);
+                ctx.stroke();
+
+                ctx.shadowBlur = 0; // Reset for performance
+            });
+        }
+
         function update() {
             if (gameState !== 'PLAYING') return;
 
-            lavaOffset += 2; // Speed of the lava flow
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
 
@@ -116,8 +127,7 @@
 
             pipes.forEach((pipe, i) => {
                 pipe.x -= 3.5;
-                // Collision
-                if (bird.x + bird.w - 5 > pipe.x && bird.x + 5 < pipe.x + pipe.width) {
+                if (bird.x + bird.w - 10 > pipe.x && bird.x + 10 < pipe.x + pipe.width) {
                     if (bird.y + 5 < pipe.top || bird.y + bird.h - 5 > canvas.height - pipe.bottom) gameOver();
                 }
                 if (!pipe.passed && pipe.x < bird.x) {
@@ -125,7 +135,7 @@
                     scoreLive.innerText = score;
                     pipe.passed = true;
                 }
-                if (pipe.x + pipe.width < 0) pipes.splice(i, 1);
+                if (pipe.x + pipe.width < -100) pipes.splice(i, 1);
             });
 
             if (bird.y + bird.h > canvas.height || bird.y < 0) gameOver();
@@ -136,10 +146,13 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawPipes();
             
-            // Lava Floor
+            // Flowing Lava Floor
             ctx.fillStyle = '#ff4500';
-            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
-            
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ff0000";
+            ctx.fillRect(0, canvas.height - 15, canvas.width, 15);
+            ctx.shadowBlur = 0;
+
             drawBird();
         }
 
@@ -158,6 +171,3 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
-
-
-
