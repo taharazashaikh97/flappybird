@@ -114,17 +114,6 @@ function drawBird() {
         ctx.fill();
     }
 
-    /* === HAIR (TOP SPIKES) === */
-    ctx.fillStyle = "#000";
-    for (let i = -1; i <= 1; i++) {
-        ctx.beginPath();
-        ctx.moveTo(bird.w * 0.05 + i * 6, -bird.h * 0.5);
-        ctx.lineTo(bird.w * 0.15 + i * 6, -bird.h * 0.75);
-        ctx.lineTo(bird.w * 0.25 + i * 6, -bird.h * 0.5);
-        ctx.closePath();
-        ctx.fill();
-    }
-
     ctx.restore();
 }
 
@@ -225,4 +214,5 @@ function drawBird() {
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
+
 
