@@ -9,11 +9,26 @@
             color: #fff;
             overflow: hidden;
         }
+
 #game-container {
-    /* ... other code ... */
-    background: url('https://img.freepik.com/free-vector/serene-nature-landscape-vector-illustration_1308-166927.jpg?semt=ais_hybrid&w=740&q=80') no-repeat center center;
-    background-size: cover;
-    /* ... other code ... */
+    position: relative;
+    width: 400px;
+    height: 700px;
+    background: #4b6cb7; /* Base color */
+    overflow: hidden;
+}
+
+/* New style for the moving background layer */
+#parallax-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 800px; /* Double width so it can loop */
+    height: 100%;
+    background: url('https://img.freepik.com/free-vector/serene-nature-landscape-vector-illustration_1308-166927.jpg?semt=ais_hybrid&w=740&q=80');
+    background-size: contain;
+    z-index: 1; /* Behind pipes */
+    opacity: 0.6;
 }
 
         canvas { display: block; }
@@ -76,3 +91,4 @@
 
 
         .stat-text { font-size: 20px; color: #ccc; margin-bottom: 15px; }
+
