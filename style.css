@@ -9,17 +9,12 @@
             color: #fff;
             overflow: hidden;
         }
-
-        #game-container {
-            position: relative;
-            width: 400px;
-            height: 700px;
-            border: 6px solid #222;
-            border-radius: 20px;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #1a1a2e 0%, #4a1e1b 60%, #ff4500 100%);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
+#game-container {
+    /* ... other code ... */
+    background: url('https://img.freepik.com/free-vector/serene-nature-landscape-vector-illustration_1308-166927.jpg?semt=ais_hybrid&w=740&q=80') no-repeat center center;
+    background-size: cover;
+    /* ... other code ... */
+}
 
         canvas { display: block; }
 
@@ -78,5 +73,6 @@
             cursor: pointer;
             margin-top: 25px;
         }
+
 
         .stat-text { font-size: 20px; color: #ccc; margin-bottom: 15px; }
