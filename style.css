@@ -1,3 +1,4 @@
+       body{
             margin: 0;
             background: #0a0a0a;
             display: flex;
@@ -80,3 +81,4 @@
         }
 
         .stat-text { font-size: 18px; color: #ccc; margin-bottom: 10px; }
+
