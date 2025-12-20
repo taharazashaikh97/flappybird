@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Flappy Volcano Bird</title>
-
-    <!-- Connect CSS -->
+	    <!-- Connect CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,23 +15,20 @@
         
         <div id="ui-layer">
             <div id="home-page" class="overlay">
-                <h1 class="title">VOLCANO<br>BIRD</h1>
-                <p class="stat-text">BEST: <span id="hi-val-home">0</span></p>
-                <button class="orange-btn" onclick="startGame()">PLAY</button>
+                <h1 class="title">FLAPPY<br>VOLCANO BIRD</h1>
+                <p class="stat-text">HIGH SCORE: <span id="hi-val-home">0</span></p>
+                <button class="orange-btn" onclick="startGame()">START GAME</button>
             </div>
 
             <div id="game-over" class="overlay" style="display: none;">
-                <h1 class="title">DIED</h1>
+                <h1 class="title" style="color: #ff4500;">GAME OVER</h1>
                 <p id="final-score-text" class="stat-text"></p>
                 <button class="orange-btn" onclick="startGame()">RETRY</button>
                 <button class="home-icon" onclick="showHome()">⌂</button>
             </div>
         </div>
     </div>
-
-    <!-- Connect JS -->
+	    <!-- Connect JS -->
     <script src="game.js"></script>
 </body>
 </html>
-
-
