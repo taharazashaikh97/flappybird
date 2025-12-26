@@ -49,31 +49,58 @@
             scoreLive.style.display = 'none';
         }
 
-        function drawBird() {
-            ctx.save();
-            ctx.translate(bird.x + bird.w/2, bird.y + bird.h/2);
-            ctx.rotate(Math.min(Math.PI/4, Math.max(-Math.PI/3, bird.velocity * 0.06)));
-            
-            // Yellow body with black outline
-            ctx.fillStyle = '#f7d308';
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, bird.w/2, bird.h/2, 0, 0, Math.PI * 2);
-            ctx.fill(); ctx.stroke();
+      function drawBird() {
+    ctx.save();
+    // Move to bird position and handle rotation based on velocity [cite: 32, 33]
+    ctx.translate(bird.x + bird.w / 2, bird.y + bird.h / 2);
+    ctx.rotate(Math.min(Math.PI / 4, Math.max(-Math.PI / 3, bird.velocity * 0.06)));
 
-            // Big Eye
-            ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = 'black';
-            ctx.beginPath(); ctx.arc(13, -5, 4, 0, Math.PI * 2); ctx.fill();
+    // --- BODY ---
+    ctx.fillStyle = '#f7d308'; // Yellow body [cite: 34]
+    ctx.strokeStyle = '#000';   // Black outline [cite: 35]
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, bird.w / 2, bird.h / 2, 0, 0, Math.PI * 2);
+    ctx.fill(); 
+    ctx.stroke();
 
-            // Wing
-            ctx.fillStyle = '#f7d308';
-            ctx.beginPath(); ctx.ellipse(-10, 5, 10, 6, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    // --- WING (Animated Flapping) ---
+    // Use Math.sin with the frame count to create an up-and-down motion
+    // Higher multiplier (0.2) makes it flap faster; 10 is the flap height
+    let wingOscillation = Math.sin(frame * 0.2) * 10; 
+    
+    ctx.fillStyle = '#e5c107'; // Slightly darker yellow for contrast
+    ctx.beginPath();
+    // The wing now moves vertically based on wingOscillation
+    ctx.ellipse(-10, 5 + (wingOscillation * 0.5), 12, 8 + wingOscillation, 0.2, 0, Math.PI * 2); 
+    ctx.fill(); 
+    ctx.stroke();
 
-            ctx.restore();
-        }
+    // --- EYE ---
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(10, -5, 10, 0, Math.PI * 2); 
+    ctx.fill(); 
+    ctx.stroke();
+    
+    // Pupil
+    ctx.fillStyle = 'black';
+    ctx.beginPath(); 
+    ctx.arc(13, -5, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // --- BEAK ---
+    ctx.fillStyle = '#ff6600';
+    ctx.beginPath();
+    ctx.moveTo(18, 0);
+    ctx.lineTo(28, 5);
+    ctx.lineTo(18, 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+}
 
         function drawPipes() {
             pipes.forEach(pipe => {
@@ -171,3 +198,4 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
+
