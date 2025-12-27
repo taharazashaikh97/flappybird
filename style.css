@@ -10,17 +10,23 @@
             overflow: hidden;
         }
 
-        #game-container {
-            position: relative;
-            width: 400px;
-            height: 700px;
-            border: 6px solid #222;
-            border-radius: 20px;
-            overflow: hidden;
-            /* Background mimics the image: Blue sky to orange lava horizon */
-            background: linear-gradient(to bottom, #4b6cb7 0%, #182848 40%, #e67e22 85%, #ff4500 100%);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
+#game-container {
+    position: relative;
+    width: 400px;
+    height: 700px;
+    border: 6px solid #222;
+    border-radius: 20px;
+    overflow: hidden;
+
+    /* Background image */
+    background-image: url("background.jpg");
+    background-size: cover;        /* Fill container */
+    background-position: center;   /* Center image */
+    background-repeat: no-repeat;
+
+    box-shadow: 0 0 50px rgba(0,0,0,1);
+}
+
 
         canvas { display: block; }
 
@@ -81,4 +87,5 @@
         }
 
         .stat-text { font-size: 18px; color: #ccc; margin-bottom: 10px; }
+
 
