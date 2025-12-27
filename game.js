@@ -64,17 +64,6 @@
     ctx.fill(); 
     ctx.stroke();
 
-    // --- WING (Animated Flapping) ---
-    // Use Math.sin with the frame count to create an up-and-down motion
-    // Higher multiplier (0.2) makes it flap faster; 10 is the flap height
-    let wingOscillation = Math.sin(frame * 0.2) * 10; 
-    
-    ctx.fillStyle = '#e5c107'; // Slightly darker yellow for contrast
-    ctx.beginPath();
-    // The wing now moves vertically based on wingOscillation
-    ctx.ellipse(-10, 5 + (wingOscillation * 0.5), 12, 8 + wingOscillation, 0.2, 0, Math.PI * 2); 
-    ctx.fill(); 
-    ctx.stroke();
 
     // --- EYE ---
     ctx.fillStyle = 'white';
@@ -198,4 +187,5 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, {passive: false});
 
         loop();
+
 
